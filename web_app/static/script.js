@@ -7,12 +7,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageWidthInput = document.getElementById('imageWidth');
     const imageHeightInput = document.getElementById('imageHeight');
     const statusMessage = document.getElementById('statusMessage');
-    
+    const regexPatternInput = document.getElementById('regexPattern'); // New field for regex
+
     let images = [];
     let currentIndex = 0;
 
     fetchButton.addEventListener('click', async () => {
         const url = urlInput.value;
+        const regexPattern = regexPatternInput.value || ''; // Get the regex pattern, default to empty if not provided
+
         if (!url) {
             statusMessage.textContent = "Please enter a valid URL.";
             return;
@@ -23,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/fetch-images', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url })
+                body: JSON.stringify({ url, regexPattern }) // Send the regex pattern along with the URL
             });
             const result = await response.json();
 

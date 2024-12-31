@@ -16,6 +16,7 @@ def index():
 def fetch_images():
     data = request.json
     url = data.get('url')
+    regex_pattern = data.get('regexPattern', IMAGE_REGEX)  # Default to existing regex if not provided
     
     try:
         # Fetch the URL content
@@ -34,7 +35,7 @@ def fetch_images():
                 urls.append(img_url)
         
         # Fallback: Add additional .jpg URLs from the raw HTML (regex order preserved)
-        additional_urls = re.findall(IMAGE_REGEX, html_content)
+        additional_urls = re.findall(regex_pattern, html_content)  # Use custom regex
         for img_url in additional_urls:
             if img_url not in urls:  # Avoid duplicates
                 urls.append(img_url)

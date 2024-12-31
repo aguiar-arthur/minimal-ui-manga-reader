@@ -16,13 +16,17 @@
             <img id="imageDisplay" src="" alt="Image will appear here">
             <button id="nextButton" disabled>Next &gt;</button>
         </div>
-        <div id="imageWidthControl">
+        <div id="#controlButtons">
             <label for="imageWidth">Image Width (px): </label>
             <input type="number" id="imageWidth" value="600" min="100">
         </div>
-        <div id="imageHeightControl">
+        <div id="#controlButtons">
             <label for="imageHeight">Image Height (px): </label>
             <input type="number" id="imageHeight" value="400" min="100">
+        </div>
+        <div id="#controlButtons">
+            <label for="regexPattern">Custom Regex Pattern: </label>
+            <input type="text" id="regexPattern" value="https?://[^\s]+?\.jpg" placeholder="Enter regex pattern for images">
         </div>
         <p id="statusMessage"></p>
     </div>
