@@ -26,23 +26,23 @@ def fetch_images():
         # Use BeautifulSoup to parse the content
         soup = BeautifulSoup(html_content, 'html.parser')
         urls = []
-        
-        # Extract all <img> tags with src ending in .jpg
+
+        # Extract <img> tags in the order they appear
         for img_tag in soup.find_all('img', src=True):
             img_url = img_tag['src']
             if img_url.endswith('.jpg'):
                 urls.append(img_url)
         
-        # Add any additional .jpg URLs from the raw text
+        # Fallback: Add additional .jpg URLs from the raw HTML (regex order preserved)
         additional_urls = re.findall(IMAGE_REGEX, html_content)
-        urls.extend(additional_urls)
-        
-        # Remove duplicates
-        urls = list(set(urls))
+        for img_url in additional_urls:
+            if img_url not in urls:  # Avoid duplicates
+                urls.append(img_url)
         
         return jsonify({"success": True, "images": urls})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
