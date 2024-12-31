@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Fetcher</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Image Fetcher</h1>
+        <input type="text" id="urlInput" placeholder="Enter a URL">
+        <button id="fetchButton">Fetch Images</button>
+        <div id="gallery" class="gallery">
+            <button id="prevButton" disabled>&lt; Prev</button>
+            <img id="imageDisplay" src="" alt="Image will appear here">
+            <button id="nextButton" disabled>Next &gt;</button>
+        </div>
+        <p id="statusMessage"></p>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
+
