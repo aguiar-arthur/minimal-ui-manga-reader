@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevButton = document.getElementById('prevButton');
     const nextButton = document.getElementById('nextButton');
     const imageDisplay = document.getElementById('imageDisplay');
+    const imageWidthInput = document.getElementById('imageWidth');
+    const imageHeightInput = document.getElementById('imageHeight');
     const statusMessage = document.getElementById('statusMessage');
     
     let images = [];
@@ -52,6 +54,20 @@ document.addEventListener('DOMContentLoaded', () => {
         updateGallery();
     });
 
+    // Update image width when the input value changes
+    imageWidthInput.addEventListener('input', () => {
+        if (imageDisplay.src) {
+            imageDisplay.style.width = `${imageWidthInput.value}px`;
+        }
+    });
+
+    // Update image height when the input value changes
+    imageHeightInput.addEventListener('input', () => {
+        if (imageDisplay.src) {
+            imageDisplay.style.height = `${imageHeightInput.value}px`;
+        }
+    });
+
     function updateGallery() {
         if (images.length === 0) {
             imageDisplay.style.display = 'none';
@@ -59,10 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
             nextButton.disabled = true;
         } else {
             imageDisplay.src = images[currentIndex];
+            imageDisplay.style.width = `${imageWidthInput.value}px`; // Set initial width
+            imageDisplay.style.height = `${imageHeightInput.value}px`; // Set initial height
             imageDisplay.style.display = 'block';
             prevButton.disabled = currentIndex === 0;
             nextButton.disabled = currentIndex === images.length - 1;
         }
     }
 });
-
