@@ -44,15 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    prevButton.addEventListener('click', () => {
-        if (currentIndex > 0) currentIndex--;
-        updateGallery();
-    });
-
-    nextButton.addEventListener('click', () => {
-        if (currentIndex < images.length - 1) currentIndex++;
-        updateGallery();
-    });
+    prevButton.addEventListener('click', () => navigateImages(-1));
+    nextButton.addEventListener('click', () => navigateImages(1));
 
     // Update image width when the input value changes
     imageWidthInput.addEventListener('input', () => {
@@ -67,6 +60,29 @@ document.addEventListener('DOMContentLoaded', () => {
             imageDisplay.style.height = `${imageHeightInput.value}px`;
         }
     });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') {
+            navigateImages(-1); // Navigate to the previous image
+        } else if (event.key === 'ArrowRight') {
+            navigateImages(1); // Navigate to the next image
+        }
+    });
+
+    function navigateImages(direction) {
+        if (images.length === 0) return;
+
+        currentIndex += direction;
+
+        if (currentIndex < 0) {
+            currentIndex = 0;
+        } else if (currentIndex >= images.length) {
+            currentIndex = images.length - 1;
+        }
+
+        updateGallery();
+    }
 
     function updateGallery() {
         if (images.length === 0) {
