@@ -5,7 +5,7 @@ import requests
 app = Flask(__name__)
 
 IMAGE_REGEX = r'(https?://[^\s]+?\.jpg)'
-JSON_PROP = 'file_url'
+JSON_PROP = 'page_url'
 
 def get_response_from_url(url):
     response = requests.get(url)
