@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import re
 import requests
-from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
@@ -19,30 +18,26 @@ def fetch_images():
     regex_pattern = data.get('regexPattern', IMAGE_REGEX)  # Default to existing regex if not provided
     
     try:
-        # Fetch the URL content
-        response = requests.get(url)
-        response.raise_for_status()
-        html_content = response.text
-        
-        # Use BeautifulSoup to parse the content
-        soup = BeautifulSoup(html_content, 'html.parser')
-        urls = []
-
-        # Extract <img> tags in the order they appear
-        for img_tag in soup.find_all('img', src=True):
-            img_url = img_tag['src']
-            if img_url.endswith('.jpg'):
-                urls.append(img_url)
-        
-        # Fallback: Add additional .jpg URLs from the raw HTML (regex order preserved)
-        additional_urls = re.findall(regex_pattern, html_content)  # Use custom regex
-        for img_url in additional_urls:
-            if img_url not in urls:  # Avoid duplicates
-                urls.append(img_url)
+        content = get_content_from_url(url)
+        urls = get_media_from_content(regex_pattern, content)
         
         return jsonify({"success": True, "images": urls})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
+
+def get_content_from_url(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    content = response.text
+    return content
+
+def get_media_from_content(regex_pattern, html_content):
+    urls = []
+        
+    additional_urls = re.findall(regex_pattern, html_content)
+    for img_url in additional_urls:
+        urls.append(img_url)
+    return urls
 
 
 if __name__ == '__main__':
