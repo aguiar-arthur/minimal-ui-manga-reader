@@ -2,11 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlInput = document.getElementById('urlInput');
     const fetchButton = document.getElementById('fetchButton');
     const jsonPatternInput = document.getElementById('jsonPattern');
+    const jsonFilterInput = document.getElementById('jsonFilter');
     const statusMessage = document.getElementById('statusMessage');
-
+    
     fetchButton.addEventListener('click', async () => {
         const url = urlInput.value;
         const jsonPattern = jsonPatternInput.value || '';
+        const jsonFilter = jsonFilterInput.value || '';
 
         if (!url) {
             statusMessage.textContent = "Please enter a valid URL.";
@@ -18,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const requestBody = {
             url,
             jsonPattern,
+            jsonFilter,
         };
 
         try {

@@ -46,6 +46,10 @@ def json_fetch_images():
         json_pattern = data.get('jsonPattern', JSON_PROP)
         content = response.json()
         
+        if (data.get('jsonFilter')):
+            filter = data.get('jsonFilter')
+            content = content.get(filter)
+
         urls =  get_from_json(content, json_pattern)
 
         return jsonify({"success": True, "images": urls})
