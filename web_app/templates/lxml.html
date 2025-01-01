@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Image Fetcher</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>lxml Image Fetcher</h1>
+        <input type="text" id="urlInput" placeholder="Enter a URL">
+        <button id="fetchButton">Fetch Images</button>
+        <div id="gallery" class="gallery">
+            <button id="prevButton" disabled>&lt; Prev</button>
+            <img id="imageDisplay" src="" alt="Image will appear here">
+            <button id="nextButton" disabled>Next &gt;</button>
+        </div>
+        <div id="controlButtons">
+            <label for="lxmlQuery">lxml query: </label>
+            <input type="text" id="lxmlQuery" value="//img/@src" placeholder="Enter a lxml query">
+        </div>
+        <div id="controlButtons">
+            <label for="imageWidth">Image Width (px): </label>
+            <input type="number" id="imageWidth" value="600" min="100">
+        </div>
+        <div id="controlButtons">
+            <label for="imageHeight">Image Height (px): </label>
+            <input type="number" id="imageHeight" value="400" min="100">
+        </div>
+        <p id="statusMessage"></p>
+    </div>
+    <script src="/static/html.js"></script>
+    <script src="/static/common.js"></script>
+</body>
+</html>

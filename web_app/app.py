@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from lxml import html
 import re
 import requests
 
@@ -6,6 +7,7 @@ app = Flask(__name__)
 
 IMAGE_REGEX = r'(https?://[^\s]+?\.jpg)'
 JSON_PROP = 'page_url'
+LXML = '//img/@src'
 
 def get_response_from_url(url):
     response = requests.get(url)
@@ -19,6 +21,10 @@ def index_regex():
 @app.route('/json')
 def index_json():
     return render_template('json.html')
+
+@app.route('/lxml')
+def html_json():
+    return render_template('lxml.html')
 
 @app.route('/regex/extract-media', methods=['POST'])
 def regex_fetch_images():
@@ -56,6 +62,23 @@ def json_fetch_images():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
 
+@app.route('/lxml/extract-media', methods=['POST'])
+def html_fetch_images():
+    data = request.json
+    url = data.get('url')
+    
+    try:
+        response = get_response_from_url(url)
+
+        content = response.text
+        lxml = data.get('lxmlQuery', LXML)
+
+        urls = get_from_html(content, lxml)
+
+        return jsonify({"success": True, "images": urls})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
 def get_media_from_raw_text(regex_pattern, html_content):
     urls = []
         
@@ -71,6 +94,13 @@ def get_from_json(content, json_pattern):
         urls.append(json.get(json_pattern))
 
     return urls
+
+def get_from_html(content, lxml): 
+    tree = html.fromstring(content)
+    urls = tree.xpath(lxml)
+
+    return urls
+
 
 if __name__ == '__main__':
     app.run(debug=True)
