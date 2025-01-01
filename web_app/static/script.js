@@ -8,7 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageHeightInput = document.getElementById('imageHeight');
     const statusMessage = document.getElementById('statusMessage');
     const regexPatternInput = document.getElementById('regexPattern');
-    const imageNumberDisplay = document.createElement('div'); // This will display the image number
+    const jsonPatternInput = document.getElementById('jsonPattern');
+    const endpointSelect = document.getElementById('endpointSelect');
+    const imageNumberDisplay = document.createElement('div');
 
     let images = [];
     let currentIndex = 0;
@@ -22,7 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetchButton.addEventListener('click', async () => {
         const url = urlInput.value;
-        const regexPattern = regexPatternInput.value || ''; // Default to empty if no regex is provided
+        const selectedEndpoint = endpointSelect.value; // Get the selected endpoint
+        const regexPattern = regexPatternInput.value || '';
+        const jsonPattern = jsonPatternInput.value || '';
 
         if (!url) {
             statusMessage.textContent = "Please enter a valid URL.";
@@ -31,11 +35,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         statusMessage.textContent = "Fetching images...";
 
+        const requestBody = {
+            url,
+            ...(selectedEndpoint === '/regex/extract-media' && { regexPattern }),
+            ...(selectedEndpoint === '/json/extract-media' && { jsonPattern }),
+        };
+
         try {
-            const response = await fetch('/fetch-images', {
+            const response = await fetch(selectedEndpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, regexPattern })
+                body: JSON.stringify(requestBody),
             });
             const result = await response.json();
 
