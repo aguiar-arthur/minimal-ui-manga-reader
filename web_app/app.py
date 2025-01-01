@@ -5,16 +5,20 @@ import requests
 app = Flask(__name__)
 
 IMAGE_REGEX = r'(https?://[^\s]+?\.jpg)'
-JSON_PROP = 'page_url'
+JSON_PROP = 'file_url'
 
 def get_response_from_url(url):
     response = requests.get(url)
     response.raise_for_status()
     return response
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/regex')
+def index_regex():
+    return render_template('regex.html')
+
+@app.route('/json')
+def index_json():
+    return render_template('json.html')
 
 @app.route('/regex/extract-media', methods=['POST'])
 def regex_fetch_images():
@@ -36,13 +40,12 @@ def regex_fetch_images():
 def json_fetch_images():
     data = request.json
     url = data.get('url')
-    
     try:
         response = get_response_from_url(url)
 
         json_pattern = data.get('jsonPattern', JSON_PROP)
         content = response.json()
-
+        
         urls =  get_from_json(content, json_pattern)
 
         return jsonify({"success": True, "images": urls})
