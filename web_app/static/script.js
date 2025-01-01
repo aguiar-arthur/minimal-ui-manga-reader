@@ -7,14 +7,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageWidthInput = document.getElementById('imageWidth');
     const imageHeightInput = document.getElementById('imageHeight');
     const statusMessage = document.getElementById('statusMessage');
-    const regexPatternInput = document.getElementById('regexPattern'); // New field for regex
+    const regexPatternInput = document.getElementById('regexPattern');
+    const imageNumberDisplay = document.createElement('div'); // This will display the image number
 
     let images = [];
     let currentIndex = 0;
 
+    // Set default width and height for the image
+    imageDisplay.style.width = `${imageWidthInput.value}px`;
+    imageDisplay.style.height = `${imageHeightInput.value}px`;
+
+    // Append the image number display to the gallery container
+    document.querySelector('#gallery').appendChild(imageNumberDisplay);
+
     fetchButton.addEventListener('click', async () => {
         const url = urlInput.value;
-        const regexPattern = regexPatternInput.value || ''; // Get the regex pattern, default to empty if not provided
+        const regexPattern = regexPatternInput.value || ''; // Default to empty if no regex is provided
 
         if (!url) {
             statusMessage.textContent = "Please enter a valid URL.";
@@ -22,11 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         statusMessage.textContent = "Fetching images...";
+
         try {
             const response = await fetch('/fetch-images', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, regexPattern }) // Send the regex pattern along with the URL
+                body: JSON.stringify({ url, regexPattern })
             });
             const result = await response.json();
 
@@ -43,33 +52,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 statusMessage.textContent = `Error: ${result.error}`;
             }
         } catch (error) {
-            statusMessage.textContent = "An error occurred.";
+            statusMessage.textContent = "An error occurred while fetching images.";
         }
     });
 
     prevButton.addEventListener('click', () => navigateImages(-1));
     nextButton.addEventListener('click', () => navigateImages(1));
 
-    // Update image width when the input value changes
     imageWidthInput.addEventListener('input', () => {
         if (imageDisplay.src) {
             imageDisplay.style.width = `${imageWidthInput.value}px`;
         }
     });
 
-    // Update image height when the input value changes
     imageHeightInput.addEventListener('input', () => {
         if (imageDisplay.src) {
             imageDisplay.style.height = `${imageHeightInput.value}px`;
         }
     });
 
-    // Keyboard navigation
     document.addEventListener('keydown', (event) => {
         if (event.key === 'ArrowLeft') {
-            navigateImages(-1); // Navigate to the previous image
+            navigateImages(-1);
         } else if (event.key === 'ArrowRight') {
-            navigateImages(1); // Navigate to the next image
+            navigateImages(1);
         }
     });
 
@@ -92,13 +98,17 @@ document.addEventListener('DOMContentLoaded', () => {
             imageDisplay.style.display = 'none';
             prevButton.disabled = true;
             nextButton.disabled = true;
+            imageNumberDisplay.textContent = ''; // Clear image number if no images
         } else {
             imageDisplay.src = images[currentIndex];
-            imageDisplay.style.width = `${imageWidthInput.value}px`; // Set initial width
-            imageDisplay.style.height = `${imageHeightInput.value}px`; // Set initial height
+            imageDisplay.style.width = `${imageWidthInput.value}px`;
+            imageDisplay.style.height = `${imageHeightInput.value}px`;
             imageDisplay.style.display = 'block';
             prevButton.disabled = currentIndex === 0;
             nextButton.disabled = currentIndex === images.length - 1;
+
+            // Update the image number display
+            imageNumberDisplay.textContent = `Image ${currentIndex + 1} of ${images.length}`;
         }
     }
 });
