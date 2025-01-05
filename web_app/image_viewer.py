@@ -1,6 +1,5 @@
 import requests
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Button
 import numpy as np
 from io import BytesIO
 from PIL import Image
@@ -29,7 +28,7 @@ def view_images_from_urls(image_urls):
     # Function to update the image plot
     def update_image():
         img_array = fetch_image(image_urls[current_index])
-        ax.imshow(img_array)
+        ax.imshow(img_array)  # Display the image with default aspect ratio
         ax.axis('off')  # Hide axes
         plt.draw()
 
@@ -42,17 +41,24 @@ def view_images_from_urls(image_urls):
             current_index = (current_index - 1) % len(image_urls)
         update_image()
 
-    # Create the plot
-    fig, ax = plt.subplots()
-    ax.axis('off')  # Hide axes initially
-    update_image()  # Show the first image
-    
+    # Create the plot with a larger figure size (adjust width and height as needed)
+    fig, ax = plt.subplots(figsize=(16, 12))  # Size in inches (width, height)
+
+    # Set the aspect ratio to 'auto' to scale the image to fit within the plot
+    ax.set_aspect('auto', adjustable='box')
+
+    # Update the image with the first one
+    update_image()
+
     # Set the figure to fullscreen mode
     fig_manager = plt.get_current_fig_manager()
     fig_manager.full_screen_toggle()
-
+    
     # Connect the key press events to the callback function
     fig.canvas.mpl_connect('key_press_event', on_key)
+
+    # Remove padding/margins to fit image better
+    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
     # Show the plot
     plt.show()
