@@ -1,107 +1,61 @@
-from flask import Flask, render_template, request, jsonify
+from image_viewer import view_images_from_urls
 from lxml import html
-import re
 import requests
+import jmespath
 
-app = Flask(__name__)
-
-IMAGE_REGEX = r'(https?://[^\s]+?\.jpg)'
-JSON_PROP = 'page_url'
+JSON_PROP = '[*].image'
 LXML = '//img/@src'
+URL = ""
 
 def get_response_from_url(url):
     response = requests.get(url)
     response.raise_for_status()
     return response
 
-@app.route('/regex')
-def index_regex():
-    return render_template('regex.html')
+def filter_valid_image_urls(image_urls):
+    """
+    Filters the list of image URLs to return only those with valid image file extensions.
 
-@app.route('/json')
-def index_json():
-    return render_template('json.html')
-
-@app.route('/lxml')
-def html_json():
-    return render_template('lxml.html')
-
-@app.route('/regex/extract-media', methods=['POST'])
-def regex_fetch_images():
-    data = request.json
-    url = data.get('url')
+    Parameters:
+        image_urls (list): List of image URLs to filter.
     
-    try:
-        response = get_response_from_url(url)
+    Returns:
+        list: Filtered list containing only valid image URLs.
+    """
+    # List of valid image file extensions (common ones)
+    valid_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp', '.svg')
 
-        content = response.text
-        regex_pattern = data.get('regexPattern', IMAGE_REGEX)
-        urls = get_media_from_raw_text(regex_pattern, content)
+    # Use regular expression to filter URLs with valid image extensions
+    filtered_urls = [
+        url for url in image_urls if url.lower().endswith(valid_extensions)
+    ]
+    
+    return filtered_urls
 
-        return jsonify({"success": True, "images": urls})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
-
-@app.route('/json/extract-media', methods=['POST'])
-def json_fetch_images():
-    data = request.json
-    url = data.get('url')
-    try:
-        response = get_response_from_url(url)
-
-        json_pattern = data.get('jsonPattern', JSON_PROP)
-        content = response.json()
-        
-        if (data.get('jsonFilter')):
-            filter = data.get('jsonFilter')
-            content = content.get(filter)
-
-        urls =  get_from_json(content, json_pattern)
-
-        return jsonify({"success": True, "images": urls})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
-
-@app.route('/lxml/extract-media', methods=['POST'])
 def html_fetch_images():
-    data = request.json
-    url = data.get('url')
-    
-    try:
-        response = get_response_from_url(url)
+    """
+    Extracts data from HTML using XPath queries.
 
-        content = response.text
-        lxml = data.get('lxmlQuery', LXML)
+    :return: JSON response with extracted data or an error message.
+    """
 
-        urls = get_from_html(content, lxml)
-
-        return jsonify({"success": True, "images": urls})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
-
-def get_media_from_raw_text(regex_pattern, html_content):
-    urls = []
-        
-    additional_urls = re.findall(regex_pattern, html_content)
-    for img_url in additional_urls:
-        urls.append(img_url)
-    return urls
-
-def get_from_json(content, json_pattern): 
-    urls = []
-
-    for json in content:
-        urls.append(json.get(json_pattern))
-
-    return urls
-
-def get_from_html(content, lxml): 
+    # Fetch the content from the URL
+    response = get_response_from_url(URL)
+    content = response.text
     tree = html.fromstring(content)
-    urls = tree.xpath(lxml)
 
-    return urls
+    # Apply the XPath query to extract data
+    result = tree.xpath(LXML)
+    view_images_from_urls(filter_valid_image_urls(result))
 
+def json_query():
+    """
+    Processes a JSON query and returns the result.
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    :return: JSON response with the queried result or an error message.
+    """
+    response = get_response_from_url(URL)
+    content = response.json()
+    result = jmespath.search(JSON_PROP, content)
+    view_images_from_urls(filter_valid_image_urls(result))
 
