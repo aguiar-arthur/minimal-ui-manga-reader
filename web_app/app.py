@@ -32,7 +32,7 @@ def filter_valid_image_urls(image_urls):
     
     return filtered_urls
 
-def html_fetch_images():
+def html_query():
     """
     Extracts data from HTML using XPath queries.
 
@@ -59,3 +59,5 @@ def json_query():
     result = jmespath.search(JSON_PROP, content)
     view_images_from_urls(filter_valid_image_urls(result))
 
+#json_query()
+html_query()
