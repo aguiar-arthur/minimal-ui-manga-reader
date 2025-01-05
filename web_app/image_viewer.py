@@ -7,21 +7,24 @@ from PIL import Image
 
 def view_images_from_urls(image_urls):
     """
-    Displays a list of images from the provided URLs, with buttons and keyboard navigation support.
+    Displays a list of images from the provided URLs, with keyboard navigation support.
     Parameters:
         image_urls (list): List of image URLs to display.
-        img_width (int): Desired width of the displayed image.
-        img_height (int): Desired height of the displayed image.
     """
     # Initialize index to track the current image
     current_index = 0
 
     # Fetch the image from the URL
     def fetch_image(url):
-        response = requests.get(url)
-        img = Image.open(BytesIO(response.content))
-        img_array = np.array(img)
-        return img_array
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            img = Image.open(BytesIO(response.content))
+            img_array = np.array(img)
+            return img_array
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching image: {e}")
+            return np.zeros((100, 100, 3), dtype=np.uint8)  # Placeholder blank image
 
     # Function to update the image plot
     def update_image():
@@ -29,18 +32,6 @@ def view_images_from_urls(image_urls):
         ax.imshow(img_array)
         ax.axis('off')  # Hide axes
         plt.draw()
-
-    # Function for the "Next" button
-    def next_image(event):
-        nonlocal current_index
-        current_index = (current_index + 1) % len(image_urls)  # Loop back to the first image
-        update_image()
-
-    # Function for the "Previous" button
-    def prev_image(event):
-        nonlocal current_index
-        current_index = (current_index - 1) % len(image_urls)  # Loop back to the last image
-        update_image()
 
     # Function to handle keyboard arrows
     def on_key(event):
@@ -55,17 +46,6 @@ def view_images_from_urls(image_urls):
     fig, ax = plt.subplots()
     ax.axis('off')  # Hide axes initially
     update_image()  # Show the first image
-
-    # Create buttons for navigation
-    ax_next = plt.axes([0.8, 0.01, 0.1, 0.075])  # Next button position
-    ax_prev = plt.axes([0.1, 0.01, 0.1, 0.075])  # Previous button position
-
-    button_next = Button(ax_next, 'Next')
-    button_prev = Button(ax_prev, 'Previous')
-
-    # Attach button click events
-    button_next.on_clicked(next_image)
-    button_prev.on_clicked(prev_image)
 
     # Connect the key press events to the callback function
     fig.canvas.mpl_connect('key_press_event', on_key)
