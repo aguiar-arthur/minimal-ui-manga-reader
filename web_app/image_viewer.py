@@ -46,6 +46,10 @@ def view_images_from_urls(image_urls):
     fig, ax = plt.subplots()
     ax.axis('off')  # Hide axes initially
     update_image()  # Show the first image
+    
+    # Set the figure to fullscreen mode
+    fig_manager = plt.get_current_fig_manager()
+    fig_manager.full_screen_toggle()
 
     # Connect the key press events to the callback function
     fig.canvas.mpl_connect('key_press_event', on_key)
