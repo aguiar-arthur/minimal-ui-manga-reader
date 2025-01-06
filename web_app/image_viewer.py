@@ -58,23 +58,20 @@ def view_images_from_urls(image_urls):
                 elif event.key == pygame.K_MINUS:  # Minus key for zoom out
                     zoom_factor /= 1.1
 
-        # Adjust image size based on zoom factor
-        if zoom_factor != 1.0:
-            # If zoom factor is greater than 1, zoom in
-            if zoom_factor > 1.0:
-                new_width = int(image_surface.get_width() * zoom_factor)
-                new_height = int(image_surface.get_height() * zoom_factor)
+        # Check if the image is smaller than the screen size
+        original_width, original_height = image_surface.get_size()
+
+        if original_width < SCREEN_WIDTH and original_height < SCREEN_HEIGHT:
+            scaled_image = image_surface  # Use the original image size if smaller
+        else:
+            # Adjust image size based on zoom factor
+            if zoom_factor != 1.0:
+                # If zoom factor is greater than 1, zoom in
+                new_width = int(original_width * zoom_factor)
+                new_height = int(original_height * zoom_factor)
                 scaled_image = pygame.transform.smoothscale(image_surface, (new_width, new_height))
             else:
-                # Apply a minimum zoom threshold to avoid excessive downscaling and pixelation
-                min_zoom_factor = 0.1  # Prevent zooming out too much
-                if zoom_factor < min_zoom_factor:
-                    zoom_factor = min_zoom_factor
-                new_width = int(image_surface.get_width() * zoom_factor)
-                new_height = int(image_surface.get_height() * zoom_factor)
-                scaled_image = pygame.transform.smoothscale(image_surface, (new_width, new_height))
-        else:
-            scaled_image = image_surface  # No scaling when zoom factor is 1.0
+                scaled_image = image_surface  # No scaling when zoom factor is 1.0
 
         # Adjust the image position to simulate scrolling
         image_rect = scaled_image.get_rect(center=(SCREEN_WIDTH // 2 + offset_x, SCREEN_HEIGHT // 2 + offset_y))
