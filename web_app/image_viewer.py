@@ -58,20 +58,23 @@ def view_images_from_urls(image_urls):
                 elif event.key == pygame.K_MINUS:  # Minus key for zoom out
                     zoom_factor /= 1.1
 
-        # Check if the image is smaller than the screen size
+        # Get original image dimensions
         original_width, original_height = image_surface.get_size()
 
-        if original_width < SCREEN_WIDTH and original_height < SCREEN_HEIGHT:
-            scaled_image = image_surface  # Use the original image size if smaller
+        # Scale image to fit the screen if it is larger
+        if original_width > SCREEN_WIDTH or original_height > SCREEN_HEIGHT:
+            scaling_factor = min(SCREEN_WIDTH / original_width, SCREEN_HEIGHT / original_height)
+            new_width = int(original_width * scaling_factor * zoom_factor)
+            new_height = int(original_height * scaling_factor * zoom_factor)
+            scaled_image = pygame.transform.smoothscale(image_surface, (new_width, new_height))
         else:
-            # Adjust image size based on zoom factor
+            # Keep the original size for smaller images
             if zoom_factor != 1.0:
-                # If zoom factor is greater than 1, zoom in
                 new_width = int(original_width * zoom_factor)
                 new_height = int(original_height * zoom_factor)
                 scaled_image = pygame.transform.smoothscale(image_surface, (new_width, new_height))
             else:
-                scaled_image = image_surface  # No scaling when zoom factor is 1.0
+                scaled_image = image_surface
 
         # Adjust the image position to simulate scrolling
         image_rect = scaled_image.get_rect(center=(SCREEN_WIDTH // 2 + offset_x, SCREEN_HEIGHT // 2 + offset_y))
